@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP Lookup Tool | Real Location Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+body { margin:0; font-family:Arial,sans-serif; color:#ff0000; text-align:center; padding:20px; background:#000; }
+h1 { color:#ff3333; text-shadow:0 0 15px red; }
+input[type="text"] { padding:12px; width:260px; border:2px solid red; border-radius:5px; background:black; color:white; font-size:16px; box-shadow:0 0 15px red; }
+button { padding:12px 20px; margin-top:10px; background:#ff0000; color:black; border:none; border-radius:5px; cursor:pointer; font-size:16px; font-weight:bold; box-shadow:0 0 12px red; }
+#youtube-btn { background:red; color:white; margin-top:25px; padding:12px 25px; font-size:18px; border-radius:8px; font-weight:bold; box-shadow:0 0 20px red; text-decoration:none; display:inline-block; transition:0.3s; }
+#youtube-btn:hover { background:#cc0000; box-shadow:0 0 30px red; }
+#ip-info { display:none; margin-top:30px; padding:20px; background:rgba(0,0,0,0.8); border:1px solid red; border-radius:10px; box-shadow:0 0 25px red; color:white; }
+#map { height:400px; width:100%; margin-top:40px; border:2px solid red; box-shadow:0 0 25px red; border-radius:10px; }
+#footer { margin-top:40px; color:#ff3333; font-size:16px; text-shadow:0 0 10px red; }
+</style>
+</head>
+<body>
+<h1>IP Lookup Tool © 2025 | Powered by ALYANHACKER</h1>
+<div id="ip-input">
+<input type="text" id="ipAddress" placeholder="Enter IP e.g. 8.8.8.8">
+<br>
+<button onclick="getIPInfo()">Track IP</button>
+<button onclick="getMyIP()">Lookup My IP</button>
+<button onclick="clearAll()">Clear</button>
+</div>
+<div id="ip-info">
+<h2>IP Information</h2>
+<p><strong>IP:</strong> <span id="ip"></span></p>
+<p><strong>City:</strong> <span id="city"></span></p>
+<p><strong>Region:</strong> <span id="region"></span></p>
+<p><strong>Country:</strong> <span id="country"></span></p>
+<p><strong>Location:</strong> <span id="loc"></span></p>
+<p><strong>Organization:</strong> <span id="org"></span></p>
+<p><strong>Postal Code:</strong> <span id="postal"></span></p>
+<p><strong>Timezone:</strong> <span id="timezone"></span></p>
+</div>
+<div id="map"></div>
+<a id="youtube-btn" href="https://youtube.com/@crayhathcaker_offcial?si=LjhHgq3XTQqL4gKw" target="_blank">🔴 Subscribe on YouTube</a>
+<div id="footer">2025 | IP Lookup Tool | ALYANHACKER</div>
+<script>
+let map = L.map('map').setView([20, 0], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(map);
+let marker;
+function showInfo(data) {
+document.getElementById('ip').textContent = data.ip;
+document.getElementById('city').textContent = data.city;
+document.getElementById('region').textContent = data.region;
+document.getElementById('country').textContent = data.country;
+document.getElementById('loc').textContent = data.loc;
+document.getElementById('org').textContent = data.org;
+document.getElementById('postal').textContent = data.postal;
+document.getElementById('timezone').textContent = data.timezone;
+document.getElementById('ip-info').style.display='block';
+const coords = data.loc.split(",");
+const lat = parseFloat(coords[0]);
+const lon = parseFloat(coords[1]);
+if(marker) map.removeLayer(marker);
+marker=L.marker([lat,lon]).addTo(map);
+map.flyTo([lat,lon],12,{animate:true,duration:3});
+}
+function getIPInfo() {
+const ipAddress=document.getElementById('ipAddress').value;
+if(!ipAddress) return alert('Please enter an IP address.');
+fetch(`https://ipinfo.io/${ipAddress}/json`).then(res=>res.json()).then(showInfo).catch(()=>alert("Error fetching data"));
+}
+function getMyIP() {
+fetch("https://api.ipify.org?format=json").then(res=>res.json()).then(my=>{
+fetch(`https://ipinfo.io/${my.ip}/json`).then(res=>res.json()).then(showInfo);
+}).catch(()=>alert("Error fetching your IP info"));
+}
+function clearAll() {
+document.getElementById("ipAddress").value="";
+document.getElementById("ip-info").style.display="none";
+if(marker) map.removeLayer(marker);
+map.setView([20,0],2);
+}
+</script>
+</body>
+</html>
